@@ -25,6 +25,18 @@ namespace TokenServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("allowall",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000")
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -41,6 +53,8 @@ namespace TokenServer
                 app.UseHsts();
             }
 
+            app.UseCors("allowall");
+            app.UseStaticFiles();
             app.UseHttpsRedirection();
             app.UseMvc();
         }

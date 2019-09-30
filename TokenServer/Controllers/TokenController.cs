@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace TokenServer.Controllers
 {
@@ -46,6 +47,7 @@ namespace TokenServer.Controllers
 
             var secret = _configuration["Secret"];
             var clientId = _configuration["ClientId"];
+            var clientUrl = _configuration["ClientUrl"];
 
             var secretClientIdBase64 = this.Base64Encode($"{clientId}:{secret}");
 
@@ -66,7 +68,10 @@ namespace TokenServer.Controllers
                 result = await response.Content.ReadAsStringAsync();
             }
 
-            return Ok(result);
+            var resultObject = JsonConvert.DeserializeObject<TokenResult>(result);
+
+            //return Ok(result);
+            return Redirect($"{clientUrl}/login/{resultObject.access_token}");
         }
 
         private string Base64Encode(string plainText)
